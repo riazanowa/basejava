@@ -11,6 +11,7 @@ public class ArrayStorage {
         for (int i = 0; i < size; i++) {
             storage[i] = null;
         }
+        size = 0;
     }
 
     void save(Resume r) {
