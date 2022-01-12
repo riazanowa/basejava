@@ -3,13 +3,12 @@ package com.urise.webapp.storage;
 import com.urise.webapp.model.Resume;
 
 import java.util.Arrays;
-import java.util.Random;
 
 /**
  * Array based storage for Resumes
  */
 public class ArrayStorage {
-    Resume[] storage = new Resume[10000];
+    private Resume[] storage = new Resume[10000];
     private int size;
 
     public void clear() {
@@ -18,43 +17,45 @@ public class ArrayStorage {
     }
 
     public void update(Resume r) {
-        if (isPresent(r.getUuid())) {
-            Resume resume1 = get(r.getUuid());
-            resume1.setUuid("uuid" + new Random().nextInt(10000));
-            System.out.println("Successfully updated");
+        int index = getIndex(r.getUuid());
+        if (index == -1) {
+            System.out.println("Not updated. Resume " + r.getUuid() + " doesn't exist.");
         } else {
-            System.out.println("Not updated. Resume doesn't exist.");
+            storage[index] = r;
         }
     }
 
     public void save(Resume r) {
-        if (size() == storage.length) System.out.println("Can't be saved. The storage is full");
+        if (size == storage.length) System.out.println("Can't be saved. The storage is full");
 
-        if (!isPresent(r.getUuid())) {
+        if (getIndex(r.getUuid()) == -1) {
             storage[size++] = r;
-            System.out.println("Saved.");
+            System.out.println("Resume " + r.getUuid() + " has been saved.");
         } else {
-            System.out.println("Not saved. Resume is already present.");
+            System.out.println("Not saved. Resume " + r.getUuid() + " is already present.");
         }
     }
 
     public Resume get(String uuid) {
-        for (int i = 0; i < size; i++) {
-            if (uuid.equals(storage[i].getUuid())) return storage[i];
+        int index = getIndex(uuid);
+
+        if (index != -1) {
+            return storage[index];
+        } else {
+            return null;
         }
-        return null;
     }
 
     public void delete(String uuid) {
-        int i;
-        for (i = 0; i < size; i++) {
-            if (uuid.equals(storage[i].toString())) break;
-        }
+        int i = getIndex(uuid);
 
-        for (int j = i; j < size - 1; j++) {
-            storage[j] = storage[j + 1];
+        if (i != -1) {
+            if (size - 1 - i >= 0) System.arraycopy(storage, i + 1, storage, i, size - 1 - i);
+            storage[--size] = null;
+            System.out.println("Resume " + uuid + " has been deleted");
+        } else {
+            System.out.println("Can't be deleted. The resume " + uuid + " doesn't exist.");
         }
-        storage[--size] = null;
     }
 
     /**
@@ -69,7 +70,16 @@ public class ArrayStorage {
     }
 
     public boolean isPresent(String uuid) {
-        if (get(uuid) != null) return true;
-        return false;
+        return getIndex(uuid) != -1;
+    }
+
+    public int getIndex(String uuid) {
+        int i;
+        for (i = 0; i < size; i++) {
+            if (storage[i].getUuid().equals(uuid)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
