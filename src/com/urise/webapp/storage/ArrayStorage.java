@@ -22,6 +22,7 @@ public class ArrayStorage {
             System.out.println("Not updated. Resume " + r.getUuid() + " doesn't exist.");
         } else {
             storage[index] = r;
+            System.out.println("Resume " + r.getUuid() + " has been updated successfully.");
         }
     }
 
