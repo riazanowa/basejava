@@ -42,10 +42,9 @@ public class ArrayStorage {
 
         if (index != -1) {
             return storage[index];
-        } else {
-            System.out.println("Resume " + uuid + " doesn't exists.");
-            return null;
         }
+        System.out.println("Resume " + uuid + " doesn't exists.");
+        return null;
     }
 
     public void delete(String uuid) {
