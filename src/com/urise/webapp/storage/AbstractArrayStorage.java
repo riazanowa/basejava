@@ -1,10 +1,13 @@
 package com.urise.webapp.storage;
 
+import com.urise.webapp.exception.ExistStorageException;
+import com.urise.webapp.exception.NotExistStorageException;
+import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage implements Storage{
+public abstract class AbstractArrayStorage implements Storage {
     protected static final int STORAGE_LIMIT = 10000;
 
     protected Resume[] storage = new Resume[STORAGE_LIMIT];
@@ -25,7 +28,8 @@ public abstract class AbstractArrayStorage implements Storage{
             storage[index] = r;
             System.out.println("Resume " + r.getUuid() + " has been updated successfully.");
         } else {
-            System.out.println("Not updated. Resume " + r.getUuid() + " doesn't exist.");
+            throw new NotExistStorageException(r.getUuid());
+            //System.out.println("Not updated. Resume " + r.getUuid() + " doesn't exist.");
         }
     }
 
@@ -37,9 +41,11 @@ public abstract class AbstractArrayStorage implements Storage{
             storage[--size] = null;
             System.out.println("Resume " + uuid + " has been deleted");
         } else {
-            System.out.println("Can't be deleted. The resume " + uuid + " doesn't exist.");
+            throw new NotExistStorageException(uuid);
+            //System.out.println("Can't be deleted. The resume " + uuid + " doesn't exist.");
         }
     }
+
 
     /**
      * @return array, contains only Resumes in storage (without null)
@@ -50,25 +56,28 @@ public abstract class AbstractArrayStorage implements Storage{
 
     public Resume get(String uuid) {
         int index = getIndex(uuid);
-
-        if (index >= 0) {
-            return storage[index];
+        if (index < 0) {
+            //System.out.println("Resume " + uuid + " doesn't exists.");
+            throw new NotExistStorageException(uuid);
         }
-        System.out.println("Resume " + uuid + " doesn't exists.");
-        return null;
+        return storage[index];
     }
 
     public void save(Resume r) {
-        if (size == storage.length) System.out.println("Can't be saved. The storage is full");
+        if (size == storage.length) {
+            //System.out.println("Can't be saved. The storage is full");
+            throw new StorageException("Storage overflow", r.getUuid());
+        }
 
         int index = getIndex(r.getUuid());
 
-        if ( index >= 0) {
-            System.out.println("Not saved. Resume " + r.getUuid() + " is already present.");
+        if (index >= 0) {
+            //System.out.println("Not saved. Resume " + r.getUuid() + " is already present.");
+            throw new ExistStorageException(r.getUuid());
         } else {
             insert(r, index);
             size++;
-            System.out.println("Resume " + r.getUuid() + " has been saved.");
+            //System.out.println("Resume " + r.getUuid() + " has been saved.");
         }
     }
 
