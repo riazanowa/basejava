@@ -24,26 +24,21 @@ public abstract class AbstractArrayStorage implements Storage {
 
     public void update(Resume r) {
         int index = getIndex(r.getUuid());
-        if (index >= 0) {
-            storage[index] = r;
-            System.out.println("Resume " + r.getUuid() + " has been updated successfully.");
-        } else {
+
+        if (index < 0) {
             throw new NotExistStorageException(r.getUuid());
-            //System.out.println("Not updated. Resume " + r.getUuid() + " doesn't exist.");
         }
+        storage[index] = r;
     }
 
     public void delete(String uuid) {
         int index = getIndex(uuid);
 
-        if (index >= 0) {
-            if (size - 1 - index >= 0) System.arraycopy(storage, index + 1, storage, index, size - 1 - index);
-            storage[--size] = null;
-            System.out.println("Resume " + uuid + " has been deleted");
-        } else {
+        if (index < 0) {
             throw new NotExistStorageException(uuid);
-            //System.out.println("Can't be deleted. The resume " + uuid + " doesn't exist.");
         }
+        if (size - 1 - index >= 0) System.arraycopy(storage, index + 1, storage, index, size - 1 - index);
+        storage[--size] = null;
     }
 
 
@@ -57,7 +52,6 @@ public abstract class AbstractArrayStorage implements Storage {
     public Resume get(String uuid) {
         int index = getIndex(uuid);
         if (index < 0) {
-            //System.out.println("Resume " + uuid + " doesn't exists.");
             throw new NotExistStorageException(uuid);
         }
         return storage[index];
@@ -65,20 +59,16 @@ public abstract class AbstractArrayStorage implements Storage {
 
     public void save(Resume r) {
         if (size == storage.length) {
-            //System.out.println("Can't be saved. The storage is full");
             throw new StorageException("Storage overflow", r.getUuid());
         }
 
         int index = getIndex(r.getUuid());
 
         if (index >= 0) {
-            //System.out.println("Not saved. Resume " + r.getUuid() + " is already present.");
             throw new ExistStorageException(r.getUuid());
-        } else {
-            insert(r, index);
-            size++;
-            //System.out.println("Resume " + r.getUuid() + " has been saved.");
         }
+        insert(r, index);
+        size++;
     }
 
     protected abstract int getIndex(String uuid);
