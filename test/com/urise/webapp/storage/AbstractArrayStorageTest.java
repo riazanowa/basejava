@@ -53,8 +53,8 @@ abstract class AbstractArrayStorageTest {
 
     @Test
     public void updateNotExistentResume() {
-        Resume R_4 = new Resume(UUID_4);
-        assertThrows(NotExistStorageException.class, () -> storage.update(R_4));
+        Resume r_4 = new Resume(UUID_4);
+        assertThrows(NotExistStorageException.class, () -> storage.update(r_4));
     }
 
     @Test
