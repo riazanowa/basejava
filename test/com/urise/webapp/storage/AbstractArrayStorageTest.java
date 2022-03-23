@@ -35,8 +35,7 @@ abstract class AbstractArrayStorageTest {
 
     @Test
     public void size() {
-        int expected = 3;
-        assertEquals(expected, storage.size());
+        assertEquals(3, storage.size());
     }
 
     @Test
@@ -88,11 +87,10 @@ abstract class AbstractArrayStorageTest {
 
     @Test
     public void save() {
-        Resume R_4 = new Resume(UUID_4);
-        storage.save(R_4);
-        int expectedSize = 4;
-        assertSame(R_4, storage.get(UUID_4));
-        assertEquals(expectedSize, storage.size());
+        Resume r_4 = new Resume(UUID_4);
+        storage.save(r_4);
+        assertSame(r_4, storage.get(UUID_4));
+        assertEquals(4, storage.size());
     }
 
     @Test
