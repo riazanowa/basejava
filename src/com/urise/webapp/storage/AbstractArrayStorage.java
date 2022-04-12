@@ -1,13 +1,11 @@
 package com.urise.webapp.storage;
 
-import com.urise.webapp.exception.ExistStorageException;
-import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage implements Storage {
+public abstract class AbstractArrayStorage extends AbstractStorage implements Storage {
     protected static final int STORAGE_LIMIT = 10000;
 
     protected Resume[] storage = new Resume[STORAGE_LIMIT];
@@ -22,26 +20,6 @@ public abstract class AbstractArrayStorage implements Storage {
         size = 0;
     }
 
-    public void update(Resume r) {
-        int index = getIndex(r.getUuid());
-
-        if (index < 0) {
-            throw new NotExistStorageException(r.getUuid());
-        }
-        storage[index] = r;
-    }
-
-    public void delete(String uuid) {
-        int index = getIndex(uuid);
-
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        }
-        if (size - 1 - index >= 0) System.arraycopy(storage, index + 1, storage, index, size - 1 - index);
-        storage[--size] = null;
-    }
-
-
     /**
      * @return array, contains only Resumes in storage (without null)
      */
@@ -49,29 +27,30 @@ public abstract class AbstractArrayStorage implements Storage {
         return Arrays.copyOf(storage, size);
     }
 
-    public Resume get(String uuid) {
-        int index = getIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        }
+    protected Resume getResumeByIndex(int index) {
         return storage[index];
     }
 
-    public void save(Resume r) {
-        if (size == storage.length) {
-            throw new StorageException("Storage overflow", r.getUuid());
-        }
-
-        int index = getIndex(r.getUuid());
-
-        if (index >= 0) {
-            throw new ExistStorageException(r.getUuid());
-        }
-        insert(r, index);
+    @Override
+    protected void changeSize() {
         size++;
     }
 
-    protected abstract int getIndex(String uuid);
+    @Override
+    protected void rangeCheckForSave(Resume resume) {
+        if (size == storage.length) {
+            throw new StorageException("Storage overflow", resume.getUuid());
+        }
+    }
 
-    protected abstract void insert(Resume resume, int position);
+    @Override
+    protected void set(int index, Resume resume) {
+        storage[index] = resume;
+    }
+
+    @Override
+    protected void fastDelete(int index) {
+        if (size - 1 - index >= 0) System.arraycopy(storage, index + 1, storage, index, size - 1 - index);
+        storage[--size] = null;
+    }
 }

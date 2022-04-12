@@ -4,6 +4,7 @@ import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +38,11 @@ abstract class AbstractArrayStorageTest {
         storage.save(R_1);
         storage.save(R_2);
         storage.save(R_3);
+    }
+
+    @AfterEach
+    void cleanEach() {
+        storage.clear();
     }
 
     @Test

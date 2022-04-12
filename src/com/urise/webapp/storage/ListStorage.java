@@ -1,12 +1,9 @@
 package com.urise.webapp.storage;
 
-import com.urise.webapp.exception.ExistStorageException;
-import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.model.Resume;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ListStorage extends AbstractStorage {
     private static final List<Resume> storage = new ArrayList<>();
@@ -22,43 +19,43 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    public void update(Resume r) {
-        int index = getIndex(r.getUuid());
-
-        if (index < 0) {
-            throw new NotExistStorageException(r.getUuid());
-        }
-       storage.set(index, r);
-    }
-
-    @Override
-    public void delete(String uuid) {
-        Resume resume = get(uuid);
-        if (!storage.contains(resume)) throw new NotExistStorageException(uuid);
-        storage.remove(resume);
-    }
-
-    @Override
     public Resume[] getAll() {
         return storage.toArray(new Resume[storage.size()]);
     }
 
     @Override
-    public Resume get(String uuid) {
-        return storage.stream().filter(resume ->
-                Objects.equals(resume.getUuid(), uuid))
-                .findFirst()
-                .orElseThrow(() -> new NotExistStorageException(uuid));
+    protected void changeSize() {
     }
 
     @Override
-    public void save(Resume r) {
-        if (storage.contains(r)) throw new ExistStorageException(r.getUuid());
-        storage.add(r);
+    protected void rangeCheckForSave(Resume resume) {
+    }
+
+    protected Resume getResumeByIndex(int index) {
+        return storage.get(index);
     }
 
     @Override
     public int getIndex(String uuid) {
-        return storage.indexOf(get(uuid));
+        for (int i = 0; i < size(); i++) {
+            if (uuid.equals(storage.get(i).getUuid())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    protected void set(int index, Resume resume) {
+        storage.set(index, resume);
+    }
+
+    @Override
+    protected void fastDelete(int index) {
+        storage.remove(index);
+    }
+
+    public void insert(Resume resume, int position) {
+        storage.add(resume);
     }
 }
