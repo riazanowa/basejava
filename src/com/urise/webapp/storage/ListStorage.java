@@ -23,14 +23,6 @@ public class ListStorage extends AbstractStorage {
         return storage.toArray(new Resume[storage.size()]);
     }
 
-    @Override
-    protected void changeSize() {
-    }
-
-    @Override
-    protected void rangeCheckForSave(Resume resume) {
-    }
-
     protected Resume getResumeByIndex(int index) {
         return storage.get(index);
     }
@@ -46,12 +38,12 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void set(int index, Resume resume) {
+    protected void updateResume(int index, Resume resume) {
         storage.set(index, resume);
     }
 
     @Override
-    protected void fastDelete(int index) {
+    protected void deleteResume(int index) {
         storage.remove(index);
     }
 

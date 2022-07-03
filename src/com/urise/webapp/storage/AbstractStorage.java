@@ -13,7 +13,7 @@ public abstract class AbstractStorage implements Storage {
             throw new NotExistStorageException(r.getUuid());
         }
 
-        set(index, r);
+        updateResume(index, r);
     }
 
     public void delete(String uuid) {
@@ -23,7 +23,7 @@ public abstract class AbstractStorage implements Storage {
             throw new NotExistStorageException(uuid);
         }
 
-        fastDelete(index);
+        deleteResume(index);
     }
 
     @Override
@@ -36,7 +36,6 @@ public abstract class AbstractStorage implements Storage {
     }
 
     public void save(Resume r) {
-        rangeCheckForSave(r);
 
         int index = getIndex(r.getUuid());
 
@@ -44,20 +43,15 @@ public abstract class AbstractStorage implements Storage {
             throw new ExistStorageException(r.getUuid());
         }
         insert(r, index);
-        changeSize();
     }
-
-    protected abstract void changeSize();
-
-    protected abstract void rangeCheckForSave(Resume resume);
 
     protected abstract Resume getResumeByIndex(int index);
 
     protected abstract int getIndex(String uuid);
 
-    protected abstract void set(int index, Resume resume);
+    protected abstract void updateResume(int index, Resume resume);
 
-    protected abstract void fastDelete(int index);
+    protected abstract void deleteResume(int index);
 
     protected abstract void insert(Resume resume, int position);
 }
