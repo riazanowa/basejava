@@ -1,6 +1,5 @@
 package com.urise.webapp.storage;
 
-import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 
@@ -28,29 +27,28 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return Arrays.copyOf(storage, size);
     }
 
-    protected Resume getResumeByIndex(Object index) {
+    protected Resume getResume(Object index) {
         return storage[(int) index];
     }
 
     @Override
     protected void updateResume(Object index, Resume resume) {
-        storage[ (int) index] = resume;
+        storage[(int) index] = resume;
     }
 
     @Override
     protected void deleteResume(Object index) {
-        if (size - 1 - (int) index >= 0) System.arraycopy(storage, (int) index + 1, storage, (int) index, size - 1 - (int) index);
+        int ind = (int) index;
+        if (size - 1 - ind >= 0) System.arraycopy(storage, ind + 1, storage, ind, size - 1 - (int) index);
         storage[--size] = null;
     }
 
     @Override
-    public void save(Resume r) {
+    public void insertResume(Resume r, Object index) {
         if (size == storage.length) {
             throw new StorageException("Storage overflow", r.getUuid());
         }
-        int index = (int) getIndex(r.getUuid());
-        if (index >= 0) throw new ExistStorageException(r.getUuid());
-        insertResume(r, index);
+        saveToArray(r, index);
         size++;
     }
 
@@ -58,4 +56,6 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     protected boolean isExist(Object index) {
         return (int) index >= 0;
     }
+
+    protected abstract void saveToArray(Resume resume, Object index);
 }

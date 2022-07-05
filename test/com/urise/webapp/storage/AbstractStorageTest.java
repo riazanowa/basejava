@@ -81,10 +81,10 @@ abstract class AbstractStorageTest {
 
     @Test
     public void getAll() {
-        Resume[] resumes = {R_1, R_2, R_3};
-        Resume[] result = storage.getAll();
-        Arrays.sort(result, Comparator.comparing(Resume::getUuid));
-        assertArrayEquals(resumes, result);
+        Resume[] expected = {R_1, R_2, R_3};
+        Resume[] actual = storage.getAll();
+        Arrays.sort(actual, Comparator.comparing(Resume::getUuid));
+        assertArrayEquals(expected, actual);
     }
 
     @Test
