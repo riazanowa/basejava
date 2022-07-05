@@ -7,6 +7,7 @@ public class MapStorageTest extends AbstractStorageTest {
     }
 
     @Override
-    public void saveInFullStorage() {
+    public void saveOverflow() {
     }
+
 }

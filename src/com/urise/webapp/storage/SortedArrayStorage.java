@@ -5,16 +5,17 @@ import com.urise.webapp.model.Resume;
 import java.util.Arrays;
 
 public class SortedArrayStorage extends AbstractArrayStorage {
+
     @Override
-    protected int getIndex(String uuid) {
+    protected Integer getIndex(String uuid) {
         Resume searchKey = new Resume(uuid);
         return Arrays.binarySearch(storage, 0, size, searchKey);
     }
 
     @Override
-    protected void insert(Resume resume, int position) {
-        int index = -position - 1;
-        if (size - index >= 0) System.arraycopy(storage, index, storage, index + 1, size - index);
-        storage[index] = resume;
+    protected void insertResume(Resume resume, Object index) {
+        int ind = - (int) index - 1;
+        if (size - ind >= 0) System.arraycopy(storage, ind, storage, ind + 1, size - ind);
+        storage[ind] = resume;
     }
 }

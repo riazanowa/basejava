@@ -6,36 +6,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MapStorage extends AbstractStorage {
-    private static final Map<Integer, Resume> storage = new HashMap<>();
+    private static final Map<String, Resume> storage = new HashMap<>();
     private static int counter = 0;
 
     @Override
-    protected Resume getResumeByIndex(int index) {
-        return storage.get(index);
+    protected Resume getResumeByIndex(Object index) {
+        return storage.get((String) index);
     }
 
     @Override
-    protected int getIndex(String uuid) {
-        for (Map.Entry<Integer, Resume> entry : storage.entrySet()) {
+    protected String getIndex(String uuid) {
+        for (Map.Entry<String, Resume> entry : storage.entrySet()) {
             if (entry.getValue().getUuid().equals(uuid)) return entry.getKey();
         }
-        return -1;
+        return null;
     }
 
     @Override
-    protected void updateResume(int index, Resume resume) {
-        storage.replace(index, resume);
+    protected void updateResume(Object index, Resume resume) {
+        storage.replace( (String) index, resume);
     }
 
     @Override
-    protected void deleteResume(int index) {
+    protected void deleteResume(Object index) {
         storage.remove(index);
         counter--;
     }
 
     @Override
-    protected void insert(Resume resume, int position) {
-        storage.put(++counter, resume);
+    protected void insertResume(Resume resume, Object index) {
+        ++counter;
+        storage.put(resume.getUuid(), resume);
     }
 
     @Override
@@ -52,5 +53,10 @@ public class MapStorage extends AbstractStorage {
     @Override
     public int size() {
         return storage.size();
+    }
+
+    @Override
+    protected boolean isExist(Object index) {
+        return index != null;
     }
 }

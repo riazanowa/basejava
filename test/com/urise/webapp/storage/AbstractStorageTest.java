@@ -4,9 +4,11 @@ import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.Comparator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,13 +23,13 @@ abstract class AbstractStorageTest {
     public static final Resume R_2;
     public static final Resume R_3;
 
+    private Storage storage;
+
     static {
         R_1 = new Resume(UUID_1);
         R_2 = new Resume(UUID_2);
         R_3 = new Resume(UUID_3);
     }
-
-    private Storage storage;
 
     public AbstractStorageTest(Storage storage) {
         this.storage = storage;
@@ -35,14 +37,10 @@ abstract class AbstractStorageTest {
 
     @BeforeEach
     void setUp() {
+        storage.clear();
         storage.save(R_1);
         storage.save(R_2);
         storage.save(R_3);
-    }
-
-    @AfterEach
-    void cleanEach() {
-        storage.clear();
     }
 
     @Test
@@ -84,7 +82,9 @@ abstract class AbstractStorageTest {
     @Test
     public void getAll() {
         Resume[] resumes = {R_1, R_2, R_3};
-        assertArrayEquals(resumes, storage.getAll());
+        Resume[] result = storage.getAll();
+        Arrays.sort(result, Comparator.comparing(Resume::getUuid));
+        assertArrayEquals(resumes, result);
     }
 
     @Test
@@ -106,7 +106,7 @@ abstract class AbstractStorageTest {
     }
 
     @Test
-    public void saveInFullStorage() {
+    public void saveOverflow() {
         try {
             storage.clear();
             for (int i = 0; i < 10000; i++) {

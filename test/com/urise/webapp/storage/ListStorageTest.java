@@ -7,6 +7,6 @@ class ListStorageTest extends AbstractStorageTest {
     }
 
     @Override
-    public void saveInFullStorage() {
+    public void saveOverflow() {
     }
 }
