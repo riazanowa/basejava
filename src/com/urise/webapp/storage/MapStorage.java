@@ -15,9 +15,7 @@ public class MapStorage extends AbstractStorage {
 
     @Override
     protected String findSearchKey(String uuid) {
-        for (Map.Entry<String, Resume> entry : storage.entrySet()) {
-            if (entry.getValue().getUuid().equals(uuid)) return entry.getKey();
-        }
+        if (storage.containsKey(uuid)) return uuid;
         return null;
     }
 
