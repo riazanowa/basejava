@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.Comparator;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +19,11 @@ abstract class AbstractStorageTest {
     public static final String UUID_3 = "uuid3";
     public static final String UUID_4 = "uuid4";
 
+    public static final String FULLNAME_1 = "fullname1";
+    public static final String FULLNAME_2 = "fullname2";
+    public static final String FULLNAME_3 = "fullname3";
+    public static final String FULLNAME_4 = "fullname4";
+
     public static final Resume R_1;
     public static final Resume R_2;
     public static final Resume R_3;
@@ -26,9 +31,9 @@ abstract class AbstractStorageTest {
     private Storage storage;
 
     static {
-        R_1 = new Resume(UUID_1);
-        R_2 = new Resume(UUID_2);
-        R_3 = new Resume(UUID_3);
+        R_1 = new Resume(UUID_1, FULLNAME_1);
+        R_2 = new Resume(UUID_2, FULLNAME_2);
+        R_3 = new Resume(UUID_3, FULLNAME_3);
     }
 
     public AbstractStorageTest(Storage storage) {
@@ -56,14 +61,14 @@ abstract class AbstractStorageTest {
 
     @Test
     public void update() {
-        Resume newResume = new Resume(UUID_3);
+        Resume newResume = new Resume(UUID_3, FULLNAME_3);
         storage.update(newResume);
         assertSame(newResume, storage.get(UUID_3));
     }
 
     @Test
     public void updateNotExistentResume() {
-        Resume r_4 = new Resume(UUID_4);
+        Resume r_4 = new Resume(UUID_4, FULLNAME_4);
         assertThrows(NotExistStorageException.class, () -> storage.update(r_4));
     }
 
@@ -81,10 +86,9 @@ abstract class AbstractStorageTest {
 
     @Test
     public void getAll() {
-        Resume[] expected = {R_1, R_2, R_3};
-        Resume[] actual = storage.getAll();
-        Arrays.sort(actual, Comparator.comparing(Resume::getUuid));
-        assertArrayEquals(expected, actual);
+        List<Resume> expected = Arrays.asList(R_1, R_2, R_3);
+        List<Resume> actual = storage.getAllSorted();
+        assertEquals(actual, expected);
     }
 
     @Test
@@ -99,7 +103,7 @@ abstract class AbstractStorageTest {
 
     @Test
     public void save() {
-        Resume r_4 = new Resume(UUID_4);
+        Resume r_4 = new Resume(UUID_4, FULLNAME_4);
         storage.save(r_4);
         assertSame(r_4, storage.get(UUID_4));
         assertEquals(4, storage.size());
@@ -110,12 +114,12 @@ abstract class AbstractStorageTest {
         try {
             storage.clear();
             for (int i = 0; i < 10000; i++) {
-                storage.save(new Resume("uuid" + i));
+                storage.save(new Resume("uuid" + i, "name" + i));
             }
         } catch (Exception e) {
             fail("Overflow happened earlier than expected");
         }
-        assertThrows(StorageException.class, () -> storage.save(new Resume("uuid10001")));
+        assertThrows(StorageException.class, () -> storage.save(new Resume("uuid10001", "name10001")));
     }
 
     @Test
