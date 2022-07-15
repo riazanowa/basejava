@@ -2,7 +2,6 @@ package com.urise.webapp.storage;
 
 import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.NotExistStorageException;
-import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -85,10 +84,10 @@ abstract class AbstractStorageTest {
     }
 
     @Test
-    public void getAll() {
+    public void getAllSorted() {
         List<Resume> expected = Arrays.asList(R_1, R_2, R_3);
         List<Resume> actual = storage.getAllSorted();
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -110,20 +109,11 @@ abstract class AbstractStorageTest {
     }
 
     @Test
-    public void saveOverflow() {
-        try {
-            storage.clear();
-            for (int i = 0; i < 10000; i++) {
-                storage.save(new Resume("uuid" + i, "name" + i));
-            }
-        } catch (Exception e) {
-            fail("Overflow happened earlier than expected");
-        }
-        assertThrows(StorageException.class, () -> storage.save(new Resume("uuid10001", "name10001")));
-    }
-
-    @Test
     public void saveExistentResume() {
         assertThrows(ExistStorageException.class, () -> storage.save(R_3));
+    }
+
+    public Storage getStorage() {
+        return storage;
     }
 }

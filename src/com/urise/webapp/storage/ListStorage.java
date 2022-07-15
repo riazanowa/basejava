@@ -4,7 +4,6 @@ import com.urise.webapp.model.Resume;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ListStorage extends AbstractStorage {
     private static final List<Resume> storage = new ArrayList<>();
@@ -20,15 +19,6 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        return storage.stream().sorted(RESUME_COMPARATOR).collect(Collectors.toList());
-    }
-
-    protected Resume getResume(Object index) {
-        return storage.get((int) index);
-    }
-
-    @Override
     public Integer findSearchKey(String uuid) {
         for (int i = 0; i < size(); i++) {
             if (uuid.equals(storage.get(i).getUuid())) {
@@ -36,6 +26,11 @@ public class ListStorage extends AbstractStorage {
             }
         }
         return -1;
+    }
+
+    @Override
+    protected Resume getResume(Object index) {
+        return storage.get((int) index);
     }
 
     @Override
@@ -48,12 +43,17 @@ public class ListStorage extends AbstractStorage {
         storage.remove((int) index);
     }
 
-    public void insertResume(Resume resume, Object index) {
+    public void insertResume(Object index, Resume resume) {
         storage.add(resume);
     }
 
     @Override
     protected boolean isExist(Object index) {
         return (int) index >= 0;
+    }
+
+    @Override
+    protected List<Resume> getAllResumes() {
+        return storage;
     }
 }

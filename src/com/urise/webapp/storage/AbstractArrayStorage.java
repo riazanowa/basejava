@@ -27,8 +27,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     @Override
-    public List<Resume> getAllSorted() {
-        return Arrays.stream(storage).takeWhile(Objects::nonNull).sorted(RESUME_COMPARATOR).collect(Collectors.toList());
+    public List<Resume> getAllResumes() {
+        return Arrays.stream(storage).takeWhile(Objects::nonNull).collect(Collectors.toList());
     }
 
     protected Resume getResume(Object index) {
@@ -48,11 +48,11 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    public void insertResume(Resume r, Object index) {
+    public void insertResume(Object index, Resume r) {
         if (size == storage.length) {
             throw new StorageException("Storage overflow", r.getUuid());
         }
-        saveToArray(r, index);
+        saveToArray(r, (int) index);
         size++;
     }
 
@@ -61,5 +61,5 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return (int) index >= 0;
     }
 
-    protected abstract void saveToArray(Resume resume, Object index);
+    protected abstract void saveToArray(Resume resume, int index);
 }
