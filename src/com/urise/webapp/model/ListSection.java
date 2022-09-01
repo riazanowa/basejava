@@ -1,8 +1,9 @@
 package com.urise.webapp.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ListSection extends AbstractSection {
+public class ListSection extends AbstractSection implements Serializable {
     private List<String> sectionItems;
 
     public ListSection(List<String> sectionItems) {

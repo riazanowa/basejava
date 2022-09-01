@@ -1,8 +1,9 @@
 package com.urise.webapp.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ExperienceSection extends AbstractSection {
+public class ExperienceSection extends AbstractSection implements Serializable {
     private List<ExperienceStage> experienceStages;
 
     public ExperienceSection(List<ExperienceStage> backgroundStages) {

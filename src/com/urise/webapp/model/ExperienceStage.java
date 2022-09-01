@@ -1,36 +1,17 @@
 package com.urise.webapp.model;
 
-import java.time.LocalDate;
+import java.io.Serializable;
+import java.util.List;
 
-public class ExperienceStage {
-    private LocalDate startDate;
-    private LocalDate endDate;
+public class ExperienceStage implements Serializable {
     private String place;
-    private String position;
-    private String description;
+    private List<Period> periods;
+    private Link link;
 
-    public ExperienceStage(LocalDate startDate, LocalDate endDate, String place, String position, String description) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public <Period> ExperienceStage(String place, Link link, List<com.urise.webapp.model.Period> periods) {
         this.place = place;
-        this.position = position;
-        this.description = description;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+        this.link = link;
+        this.periods = periods;
     }
 
     public String getPlace() {
@@ -41,20 +22,12 @@ public class ExperienceStage {
         this.place = place;
     }
 
-    public String getPosition() {
-        return position;
+    public Link getLink() {
+        return link;
     }
 
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setLink(Link link) {
+        this.link = link;
     }
 
     @Override
@@ -62,27 +35,29 @@ public class ExperienceStage {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ExperienceStage that = (ExperienceStage) o;
+        ExperienceStage stage = (ExperienceStage) o;
 
-        if (!startDate.equals(that.startDate)) return false;
-        if (!endDate.equals(that.endDate)) return false;
-        if (!place.equals(that.place)) return false;
-        if (!position.equals(that.position)) return false;
-        return description.equals(that.description);
+        if (place != null ? !place.equals(stage.place) : stage.place != null) return false;
+        if (periods != null ? !periods.equals(stage.periods) : stage.periods != null) return false;
+        return link != null ? link.equals(stage.link) : stage.link == null;
     }
 
     @Override
     public int hashCode() {
-        int result = startDate.hashCode();
-        result = 31 * result + endDate.hashCode();
-        result = 31 * result + place.hashCode();
-        result = 31 * result + position.hashCode();
-        result = 31 * result + description.hashCode();
+        int result = place != null ? place.hashCode() : 0;
+        result = 31 * result + (periods != null ? periods.hashCode() : 0);
+        result = 31 * result + (link != null ? link.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return startDate + " " + endDate + " " + place + " " + position + " " + description;
+        StringBuilder sb = new StringBuilder("");
+        if (!periods.isEmpty()) {
+            for (Period period : periods) {
+                sb.append(period.getStartDate() + " " + period.getEndDate() + " " + place + " " + period.getPosition() + " " + period.getDescription());
+            }
+        }
+        return sb.toString();
     }
 }

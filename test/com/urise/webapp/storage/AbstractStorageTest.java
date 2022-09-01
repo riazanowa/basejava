@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.urise.webapp.ResumeTestData.createResume;
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
@@ -30,9 +31,9 @@ abstract class AbstractStorageTest {
     private Storage storage;
 
     static {
-        R_1 = new Resume(UUID_1, FULLNAME_1);
-        R_2 = new Resume(UUID_2, FULLNAME_2);
-        R_3 = new Resume(UUID_3, FULLNAME_3);
+        R_1 = createResume(UUID_1, FULLNAME_1);
+        R_2 = createResume(UUID_2, FULLNAME_2);
+        R_3 = createResume(UUID_3, FULLNAME_3);
     }
 
     public AbstractStorageTest(Storage storage) {
@@ -60,14 +61,14 @@ abstract class AbstractStorageTest {
 
     @Test
     public void update() {
-        Resume newResume = new Resume(UUID_3, FULLNAME_3);
+        Resume newResume = createResume(UUID_3, FULLNAME_3);
         storage.update(newResume);
         assertSame(newResume, storage.get(UUID_3));
     }
 
     @Test
     public void updateNotExistentResume() {
-        Resume r_4 = new Resume(UUID_4, FULLNAME_4);
+        Resume r_4 = createResume(UUID_4, FULLNAME_4);
         assertThrows(NotExistStorageException.class, () -> storage.update(r_4));
     }
 
@@ -102,7 +103,7 @@ abstract class AbstractStorageTest {
 
     @Test
     public void save() {
-        Resume r_4 = new Resume(UUID_4, FULLNAME_4);
+        Resume r_4 = createResume(UUID_4, FULLNAME_4);
         storage.save(r_4);
         assertSame(r_4, storage.get(UUID_4));
         assertEquals(4, storage.size());

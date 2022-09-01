@@ -4,10 +4,11 @@ import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 import org.junit.jupiter.api.Test;
 
+import static com.urise.webapp.ResumeTestData.createResume;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class AbstractArrayStorageTest extends AbstractStorageTest {
+public abstract class AbstractArrayStorageTest extends AbstractStorageTest {
     public AbstractArrayStorageTest(Storage storage) {
         super(storage);
     }
@@ -23,6 +24,6 @@ public class AbstractArrayStorageTest extends AbstractStorageTest {
         } catch (Exception e) {
             fail("Overflow happened earlier than expected");
         }
-        assertThrows(StorageException.class, () -> storage.save(new Resume("uuid10001", "name10001")));
+        assertThrows(StorageException.class, () -> storage.save(createResume("uuid10001", "name10001")));
     }
 }
