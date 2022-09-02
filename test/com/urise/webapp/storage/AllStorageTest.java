@@ -4,11 +4,12 @@ import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 
 @Suite
-@SelectClasses({
+@SelectClasses ({
         ArrayStorageTest.class,
         ListStorageTest.class,
         MapStorageTest.class,
         SortedArrayStorageTest.class,
-        ResumeMapStorageTest.class})
+        ResumeMapStorageTest.class
+})
 public class AllStorageTest {
 }

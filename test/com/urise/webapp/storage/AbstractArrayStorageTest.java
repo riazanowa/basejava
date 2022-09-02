@@ -5,6 +5,7 @@ import com.urise.webapp.model.Resume;
 import org.junit.jupiter.api.Test;
 
 import static com.urise.webapp.ResumeTestData.createResume;
+import static com.urise.webapp.storage.AbstractArrayStorage.STORAGE_LIMIT;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -18,7 +19,7 @@ public abstract class AbstractArrayStorageTest extends AbstractStorageTest {
         Storage storage = getStorage();
         try {
             storage.clear();
-            for (int i = 0; i < 10000; i++) {
+            for (int i = 0; i < STORAGE_LIMIT; i++) {
                 storage.save(new Resume("uuid" + i, "name" + i));
             }
         } catch (Exception e) {

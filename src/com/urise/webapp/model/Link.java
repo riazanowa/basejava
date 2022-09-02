@@ -3,9 +3,11 @@ package com.urise.webapp.model;
 import java.io.Serializable;
 
 public class Link implements Serializable {
+    String siteName;
     private String link;
 
-    public Link(String link) {
+    public Link(String siteName, String link) {
+        this.siteName = siteName;
         this.link = link;
     }
 

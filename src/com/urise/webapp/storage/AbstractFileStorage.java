@@ -33,7 +33,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         Resume resume = null;
         try (FileInputStream fis = new FileInputStream(file);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
-            resume =  (Resume) ois.readObject();
+            resume = (Resume) ois.readObject();
         } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
         }

@@ -4,18 +4,18 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ExperienceSection extends AbstractSection implements Serializable {
-    private List<ExperienceStage> experienceStages;
+    private List<Organization> organizations;
 
-    public ExperienceSection(List<ExperienceStage> backgroundStages) {
-        this.experienceStages = backgroundStages;
+    public ExperienceSection(List<Organization> organizations) {
+        this.organizations = organizations;
     }
 
-    public List<ExperienceStage> getExperienceStages() {
-        return experienceStages;
+    public List<Organization> getExperienceStages() {
+        return organizations;
     }
 
-    public void setExperienceStages(List<ExperienceStage> experienceStages) {
-        this.experienceStages = experienceStages;
+    public void setExperienceStages(List<Organization> organizations) {
+        this.organizations = organizations;
     }
 
     @Override
@@ -25,18 +25,18 @@ public class ExperienceSection extends AbstractSection implements Serializable {
 
         ExperienceSection that = (ExperienceSection) o;
 
-        return experienceStages.equals(that.experienceStages);
+        return organizations.equals(that.organizations);
     }
 
     @Override
     public int hashCode() {
-        return experienceStages.hashCode();
+        return organizations.hashCode();
     }
 
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder("");
-        for (ExperienceStage stage : experienceStages ) {
+        for (Organization stage : organizations) {
             result.append(stage + "\n");
         }
         return result.toString();

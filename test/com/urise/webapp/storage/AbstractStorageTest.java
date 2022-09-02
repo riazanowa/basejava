@@ -105,7 +105,7 @@ abstract class AbstractStorageTest {
     public void save() {
         Resume r_4 = createResume(UUID_4, FULLNAME_4);
         storage.save(r_4);
-        assertSame(r_4, storage.get(UUID_4));
+        assertEquals(r_4, storage.get(UUID_4));
         assertEquals(4, storage.size());
     }
 

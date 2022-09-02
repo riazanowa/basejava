@@ -3,12 +3,12 @@ package com.urise.webapp.model;
 import java.io.Serializable;
 import java.util.List;
 
-public class ExperienceStage implements Serializable {
+public class Organization implements Serializable {
     private String place;
     private List<Period> periods;
     private Link link;
 
-    public <Period> ExperienceStage(String place, Link link, List<com.urise.webapp.model.Period> periods) {
+    public Organization(String place, Link link, List<Period> periods) {
         this.place = place;
         this.link = link;
         this.periods = periods;
@@ -35,7 +35,7 @@ public class ExperienceStage implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ExperienceStage stage = (ExperienceStage) o;
+        Organization stage = (Organization) o;
 
         if (place != null ? !place.equals(stage.place) : stage.place != null) return false;
         if (periods != null ? !periods.equals(stage.periods) : stage.periods != null) return false;

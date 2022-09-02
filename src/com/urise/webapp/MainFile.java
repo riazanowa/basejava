@@ -15,7 +15,7 @@ public class MainFile {
             throw new RuntimeException("Error", e);
         }
 
-        File dir = new File("C:\\projects\\basejava\\src\\com\\urise\\webapp");
+        File dir = new File("com/urise/webapp");
         System.out.println(dir.isDirectory());
         String[] list = dir.list();
         if (list != null) {
@@ -47,8 +47,10 @@ public class MainFile {
     public static void findFiles(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                findFiles(files[i]);
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    findFiles(files[i]);
+                }
             }
         } else {
             System.out.println(file.getName());
