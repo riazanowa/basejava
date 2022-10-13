@@ -11,7 +11,7 @@ import java.util.UUID;
 public class Resume implements Comparable<Resume>, Serializable {
     // Unique identifier
     private final String uuid;
-
+    private static final long serialVersionUID = 1L;
     private final String fullName;
 
     private Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);

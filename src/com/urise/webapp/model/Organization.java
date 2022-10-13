@@ -4,22 +4,13 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Organization implements Serializable {
-    private String place;
+    private static final long serialVersionUID = 1L;
     private List<Period> periods;
     private Link link;
 
-    public Organization(String place, Link link, List<Period> periods) {
-        this.place = place;
+    public Organization(Link link, List<Period> periods) {
         this.link = link;
         this.periods = periods;
-    }
-
-    public String getPlace() {
-        return place;
-    }
-
-    public void setPlace(String place) {
-        this.place = place;
     }
 
     public Link getLink() {
@@ -35,17 +26,15 @@ public class Organization implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Organization stage = (Organization) o;
+        Organization that = (Organization) o;
 
-        if (place != null ? !place.equals(stage.place) : stage.place != null) return false;
-        if (periods != null ? !periods.equals(stage.periods) : stage.periods != null) return false;
-        return link != null ? link.equals(stage.link) : stage.link == null;
+        if (periods != null ? !periods.equals(that.periods) : that.periods != null) return false;
+        return link != null ? link.equals(that.link) : that.link == null;
     }
 
     @Override
     public int hashCode() {
-        int result = place != null ? place.hashCode() : 0;
-        result = 31 * result + (periods != null ? periods.hashCode() : 0);
+        int result = periods != null ? periods.hashCode() : 0;
         result = 31 * result + (link != null ? link.hashCode() : 0);
         return result;
     }
@@ -55,7 +44,7 @@ public class Organization implements Serializable {
         StringBuilder sb = new StringBuilder("");
         if (!periods.isEmpty()) {
             for (Period period : periods) {
-                sb.append(period.getStartDate() + " " + period.getEndDate() + " " + place + " " + period.getPosition() + " " + period.getDescription());
+                sb.append(period.getStartDate() + " " + period.getEndDate() + " " + " " + period.getPosition() + " " + period.getDescription());
             }
         }
         return sb.toString();

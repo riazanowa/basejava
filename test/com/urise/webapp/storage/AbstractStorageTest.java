@@ -6,6 +6,7 @@ import com.urise.webapp.model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +14,8 @@ import static com.urise.webapp.ResumeTestData.createResume;
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
+
+    protected static final File STORAGE_DIR = new File("com/urise/webapp/resume-store");
 
     public static final String UUID_1 = "uuid1";
     public static final String UUID_2 = "uuid2";
@@ -31,6 +34,7 @@ abstract class AbstractStorageTest {
     private Storage storage;
 
     static {
+        STORAGE_DIR.mkdir();
         R_1 = createResume(UUID_1, FULLNAME_1);
         R_2 = createResume(UUID_2, FULLNAME_2);
         R_3 = createResume(UUID_3, FULLNAME_3);

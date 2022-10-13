@@ -3,20 +3,21 @@ package com.urise.webapp.model;
 import java.io.Serializable;
 
 public class Link implements Serializable {
-    String siteName;
-    private String link;
+    private static final long serialVersionUID = 1L;
+    private String siteName;
+    private String url;
 
-    public Link(String siteName, String link) {
+    public Link(String siteName, String url) {
         this.siteName = siteName;
-        this.link = link;
+        this.url = url;
     }
 
-    public String getLink() {
-        return link;
+    public String getUrl() {
+        return url;
     }
 
-    public void setLink(String link) {
-        this.link = link;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @Override
@@ -26,16 +27,16 @@ public class Link implements Serializable {
 
         Link link1 = (Link) o;
 
-        return link.equals(link1.link);
+        return url.equals(link1.url);
     }
 
     @Override
     public int hashCode() {
-        return link.hashCode();
+        return url.hashCode();
     }
 
     @Override
     public String toString() {
-        return link;
+        return url;
     }
 }
