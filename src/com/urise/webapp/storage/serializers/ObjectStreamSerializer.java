@@ -8,7 +8,7 @@ import java.io.*;
 public class ObjectStreamSerializer implements SerializeStrategy {
 
     @Override
-    public void serialize(Resume resume, OutputStream outputStream) {
+    public void doWrite(Resume resume, OutputStream outputStream) {
         try (ObjectOutputStream oos = new ObjectOutputStream(outputStream)) {
             oos.writeObject(resume);
         } catch (IOException ex) {
@@ -17,7 +17,7 @@ public class ObjectStreamSerializer implements SerializeStrategy {
     }
 
     @Override
-    public Resume deserialise(InputStream inputStream) {
+    public Resume doRead(InputStream inputStream) {
         Resume resume = null;
         try (ObjectInputStream ois = new ObjectInputStream(inputStream)) {
             resume = (Resume) ois.readObject();

@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class AbstractFileStorage extends AbstractStorage<File> {
+public class FileStorage extends AbstractStorage<File> {
     private SerializeStrategy serializer;
     private File directory;
 
 
-    public AbstractFileStorage(File directory, SerializeStrategy serializer) {
+    public FileStorage(File directory, SerializeStrategy serializer) {
         this.serializer = serializer;
         Objects.requireNonNull(directory, "Must not be null");
         if (!directory.isDirectory()) {
@@ -37,7 +37,7 @@ public class AbstractFileStorage extends AbstractStorage<File> {
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
             resume = doRead(bis);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new StorageException("Couldn't get resume: ", resume.getUuid());
         }
         return resume;
     }
@@ -52,7 +52,7 @@ public class AbstractFileStorage extends AbstractStorage<File> {
         try {
             doWrite(resume, new BufferedOutputStream(new FileOutputStream(file)));
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new StorageException("Couldn't update resume: ", resume.getUuid());
         }
     }
 
@@ -67,22 +67,22 @@ public class AbstractFileStorage extends AbstractStorage<File> {
             file.createNewFile();
             doWrite(resume, bos);
         } catch (IOException e) {
-            throw new StorageException("IO error", file.getName(), e);
+            throw new StorageException("Couldn't save resume", file.getName(), e);
         }
     }
 
     protected void doWrite(Resume resume, OutputStream outputStream) {
-        serializer.serialize(resume, outputStream);
+        serializer.doWrite(resume, outputStream);
     }
 
     protected Resume doRead(InputStream inputStream) throws IOException {
-        return serializer.deserialise(inputStream);
+        return serializer.doRead(inputStream);
     }
 
     @Override
     protected List<Resume> getAllResumes() {
         List<Resume> resumes = new ArrayList<>();
-        for (File file : Objects.requireNonNull(directory.listFiles())) {
+        for (File file : getFiles()) {
             resumes.add(getResume(file));
         }
         return resumes;
@@ -90,13 +90,22 @@ public class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     public void clear() {
-        for (File file : Objects.requireNonNull(directory.listFiles())) {
+        for (File file : getFiles()) {
             deleteResume(file);
         }
     }
 
     @Override
     public int size() {
-        return Objects.requireNonNull(directory.listFiles()).length;
+        return getFiles().length;
+    }
+
+    private File[] getFiles() {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            return files;
+        } else {
+            throw new StorageException("Couldn't get files. Directory is empty.");
+        }
     }
 }

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
 
-    protected static final File STORAGE_DIR = new File("com/urise/webapp/resume-store");
+    protected static final File STORAGE_DIR = new File("C:\\Users\\katri\\myProjects\\resume-store");
 
     public static final String UUID_1 = "uuid1";
     public static final String UUID_2 = "uuid2";
@@ -67,7 +67,7 @@ abstract class AbstractStorageTest {
     public void update() {
         Resume newResume = createResume(UUID_3, FULLNAME_3);
         storage.update(newResume);
-        assertSame(newResume, storage.get(UUID_3));
+        assertEquals(newResume, storage.get(UUID_3));
     }
 
     @Test

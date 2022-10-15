@@ -11,13 +11,14 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class AbstractPathStorage extends AbstractStorage<Path> {
+public class PathStorage extends AbstractStorage<Path> {
 
     private SerializeStrategy serializer;
     private Path directory;
 
-    protected AbstractPathStorage(String dir, SerializeStrategy serializer) {
+    protected PathStorage(String dir, SerializeStrategy serializer) {
         this.serializer = serializer;
         directory = Paths.get(dir);
         Objects.requireNonNull(directory, "directoy must not be null");
@@ -27,32 +28,22 @@ public class AbstractPathStorage extends AbstractStorage<Path> {
     }
 
     protected void doWrite(Resume resume, OutputStream outputStream) {
-        serializer.serialize(resume, outputStream);
+        serializer.doWrite(resume, outputStream);
     }
 
     protected Resume doRead(InputStream inputStream) throws IOException {
-        return serializer.deserialise(inputStream);
+        return serializer.doRead(inputStream);
     }
 
 
     @Override
     public void clear() {
-        try {
-            Files.list(directory).forEach(this::deleteResume);
-        } catch (IOException e) {
-            throw new StorageException("Path delete error", this.toString());
-        }
+        getDirectoryContent().forEach(this::deleteResume);
     }
 
     @Override
     public int size() {
-        int count = 0;
-        try {
-            count = (int) Files.list(directory).count();
-        } catch (IOException e) {
-            throw new StorageException("Directory read error");
-        }
-        return count;
+        return (int) getDirectoryContent().count();
     }
 
     @Override
@@ -92,30 +83,31 @@ public class AbstractPathStorage extends AbstractStorage<Path> {
         } catch (IOException e) {
             throw new StorageException("Path delete error ", searchKey.toString());
         }
-
     }
 
     @Override
     protected void insertResume(Path searchKey, Resume resume) {
         try {
             Files.createFile(searchKey);
-            updateResume(searchKey, resume);
         } catch (IOException e) {
             throw new StorageException("File creation error", e);
         }
-
+        updateResume(searchKey, resume);
     }
 
     @Override
     protected List<Resume> getAllResumes() {
-        List<Resume> resumes = null;
+        return getDirectoryContent().map(this::getResume)
+                .collect(Collectors.toList());
+    }
+
+    private Stream<Path> getDirectoryContent() {
+        Stream<Path> paths = null;
         try {
-            resumes = Files.list(directory)
-                    .map(this::getResume)
-                    .collect(Collectors.toList());
+           paths = Files.list(directory);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new StorageException("Couldn't get path");
         }
-        return resumes;
+        return paths;
     }
 }
