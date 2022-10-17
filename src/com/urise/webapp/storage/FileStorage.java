@@ -33,13 +33,11 @@ public class FileStorage extends AbstractStorage<File> {
 
     @Override
     protected Resume getResume(File file) {
-        Resume resume = null;
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
-            resume = doRead(bis);
+            return doRead(bis);
         } catch (IOException ex) {
-            throw new StorageException("Couldn't get resume: ", resume.getUuid());
+            throw new StorageException("Couldn't get resume ");
         }
-        return resume;
     }
 
     @Override
