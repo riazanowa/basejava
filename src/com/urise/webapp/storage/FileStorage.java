@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class FileStorage extends AbstractStorage<File> {
-    private SerializeStrategy serializer;
-    private File directory;
+    private final SerializeStrategy serializer;
+    private final File directory;
 
 
     public FileStorage(File directory, SerializeStrategy serializer) {
@@ -56,17 +56,19 @@ public class FileStorage extends AbstractStorage<File> {
 
     @Override
     protected void deleteResume(File file) {
-        file.delete();
+       if (!file.delete()) {
+           throw new StorageException("The file hasn't been deleted.");
+       }
     }
 
     @Override
     protected void insertResume(File file, Resume resume) {
-        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
+        try {
             file.createNewFile();
-            doWrite(resume, bos);
         } catch (IOException e) {
             throw new StorageException("Couldn't save resume", file.getName(), e);
         }
+        updateResume(file, resume);
     }
 
     protected void doWrite(Resume resume, OutputStream outputStream) {

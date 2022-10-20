@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 
 public class PathStorage extends AbstractStorage<Path> {
 
-    private SerializeStrategy serializer;
-    private Path directory;
+    private final SerializeStrategy serializer;
+    private final Path directory;
 
     protected PathStorage(String dir, SerializeStrategy serializer) {
         this.serializer = serializer;
@@ -102,12 +102,10 @@ public class PathStorage extends AbstractStorage<Path> {
     }
 
     private Stream<Path> getDirectoryContent() {
-        Stream<Path> paths = null;
         try {
-           paths = Files.list(directory);
+           return Files.list(directory);
         } catch (IOException e) {
             throw new StorageException("Couldn't get path");
         }
-        return paths;
     }
 }
