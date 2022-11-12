@@ -21,6 +21,14 @@ public class Organization implements Serializable {
         this.link = link;
     }
 
+    public List<Period> getPeriods() {
+        return periods;
+    }
+
+    public void setPeriods(List<Period> periods) {
+        this.periods = periods;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -44,7 +52,7 @@ public class Organization implements Serializable {
         StringBuilder sb = new StringBuilder("");
         if (!periods.isEmpty()) {
             for (Period period : periods) {
-                sb.append(period.getStartDate() + " " + period.getEndDate() + " " + " " + period.getPosition() + " " + period.getDescription());
+                sb.append(period.getStartDate() + " " + period.getEndDate() + " " + link.getSiteName() + " " + link.getUrl() + " " + period.getPosition() + " " + period.getDescription());
             }
         }
         return sb.toString();

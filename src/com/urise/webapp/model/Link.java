@@ -23,6 +23,14 @@ public class Link implements Serializable {
         this.url = url;
     }
 
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -40,6 +48,6 @@ public class Link implements Serializable {
 
     @Override
     public String toString() {
-        return url;
+        return siteName + " " + url;
     }
 }

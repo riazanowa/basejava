@@ -49,7 +49,7 @@ public class FileStorage extends AbstractStorage<File> {
     protected void updateResume(File file, Resume resume) {
         try {
             doWrite(resume, new BufferedOutputStream(new FileOutputStream(file)));
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new StorageException("Couldn't update resume: ", resume.getUuid());
         }
     }
@@ -71,7 +71,7 @@ public class FileStorage extends AbstractStorage<File> {
         updateResume(file, resume);
     }
 
-    protected void doWrite(Resume resume, OutputStream outputStream) {
+    protected void doWrite(Resume resume, OutputStream outputStream) throws IOException {
         serializer.doWrite(resume, outputStream);
     }
 

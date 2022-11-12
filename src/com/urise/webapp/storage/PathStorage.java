@@ -27,7 +27,7 @@ public class PathStorage extends AbstractStorage<Path> {
         }
     }
 
-    protected void doWrite(Resume resume, OutputStream outputStream) {
+    protected void doWrite(Resume resume, OutputStream outputStream) throws IOException {
         serializer.doWrite(resume, outputStream);
     }
 
@@ -103,7 +103,7 @@ public class PathStorage extends AbstractStorage<Path> {
 
     private Stream<Path> getDirectoryContent() {
         try {
-           return Files.list(directory);
+            return Files.list(directory);
         } catch (IOException e) {
             throw new StorageException("Couldn't get path");
         }
