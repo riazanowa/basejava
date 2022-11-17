@@ -52,7 +52,7 @@ public class Organization implements Serializable {
         StringBuilder sb = new StringBuilder("");
         if (!periods.isEmpty()) {
             for (Period period : periods) {
-                sb.append(period.getStartDate() + " " + period.getEndDate() + " " + link.getSiteName() + " " + link.getUrl() + " " + period.getPosition() + " " + period.getDescription());
+                sb.append(period.getStartDate() + " " + period.getEndDate() + " " + (link != null? link.getSiteName() : "") + " " + (link != null? link.getUrl() : "") + " " + period.getPosition() + " " + period.getDescription());
             }
         }
         return sb.toString();

@@ -9,6 +9,7 @@ import java.util.*;
 
 public class DataStreamSerializer implements SerializeStrategy {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final String NULL_HOLDER = "NULL_HOLDER";
 
     @Override
     public void doWrite(Resume resume, OutputStream outputStream) throws IOException {
@@ -47,8 +48,13 @@ public class DataStreamSerializer implements SerializeStrategy {
                         dos.writeInt(experienceStages.size());
                         for (Organization organization : experienceStages) {
                             Link link = organization.getLink();
-                            dos.writeUTF(link.getSiteName());
-                            dos.writeUTF(link.getUrl());
+                            if (link == null) {
+                                dos.writeUTF(NULL_HOLDER);
+                            } else {
+                                dos.writeUTF(link.getSiteName());
+                                dos.writeUTF(link.getUrl());
+
+                            }
                             List<Period> periods = organization.getPeriods();
                             dos.writeInt(periods.size());
                             for (Period period : periods) {
@@ -101,9 +107,13 @@ public class DataStreamSerializer implements SerializeStrategy {
                         int sizeOfExperienceSection = dis.readInt();
                         List<Organization> organizations = new ArrayList<>();
                         for (int j = 0; j < sizeOfExperienceSection; j++) {
-                            String siteName = dis.readUTF();
-                            String url = dis.readUTF();
-                            Link link = new Link(siteName, url);
+                            Link link = null;
+                            String value = dis.readUTF();
+                            if (!value.equals(NULL_HOLDER)) {
+                                String siteName = value;
+                                String url = dis.readUTF();
+                                link = new Link(siteName, url);
+                            }
                             int sizeOfPeriods = dis.readInt();
                             List<Period> periods = new ArrayList<>();
                             for (int k = 0; k < sizeOfPeriods; k++) {
