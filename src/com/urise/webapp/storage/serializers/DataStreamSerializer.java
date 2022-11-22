@@ -18,14 +18,16 @@ public class DataStreamSerializer implements SerializeStrategy {
             dos.writeUTF(resume.getFullName());
             Map<ContactType, String> contacts = resume.getContacts();
             dos.writeInt(contacts.size());
-            for (Map.Entry<ContactType, String> entry : resume.getContacts().entrySet()) {
+            Set<Map.Entry<ContactType, String>> entrySet = contacts.entrySet();
+            writeCollection(entrySet, entry -> {
                 dos.writeUTF(entry.getKey().name());
                 dos.writeUTF(entry.getValue());
-            }
+            });
             // TODO Implements sections
             Map<SectionType, AbstractSection> sections = resume.getSections();
             dos.writeInt(sections.size());
-            for (Map.Entry<SectionType, AbstractSection> entry : sections.entrySet()) {
+            Set<Map.Entry<SectionType, AbstractSection>> entries = sections.entrySet();
+            writeCollection(entries, entry -> {
                 SectionType sectionType = entry.getKey();
                 switch (sectionType) {
                     case OBJECTIVE:
@@ -36,9 +38,7 @@ public class DataStreamSerializer implements SerializeStrategy {
                         ListSection listSection = (ListSection) entry.getValue();
                         List<String> items = listSection.getSectionItems();
                         dos.writeInt(items.size());
-                        for (String item : items) {
-                            dos.writeUTF(item);
-                        }
+                        writeCollection(items, dos::writeUTF);
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
@@ -46,29 +46,28 @@ public class DataStreamSerializer implements SerializeStrategy {
                         ExperienceSection experienceSection = (ExperienceSection) entry.getValue();
                         List<Organization> experienceStages = experienceSection.getExperienceStages();
                         dos.writeInt(experienceStages.size());
-                        for (Organization organization : experienceStages) {
+                        writeCollection(experienceStages, organization -> {
                             Link link = organization.getLink();
                             if (link == null) {
                                 dos.writeUTF(NULL_HOLDER);
                             } else {
                                 dos.writeUTF(link.getSiteName());
                                 dos.writeUTF(link.getUrl());
-
                             }
                             List<Period> periods = organization.getPeriods();
                             dos.writeInt(periods.size());
-                            for (Period period : periods) {
+                            writeCollection(periods, period -> {
                                 dos.writeUTF(period.getStartDate().toString());
                                 dos.writeUTF(period.getEndDate().toString());
                                 dos.writeUTF(period.getPosition());
                                 dos.writeUTF(period.getDescription());
-                            }
-                        }
+                            });
+                        });
                         break;
                     default:
                         throw new IllegalArgumentException("Data is not correct");
                 }
-            }
+            });
         }
     }
 
@@ -135,4 +134,15 @@ public class DataStreamSerializer implements SerializeStrategy {
             return resume;
         }
     }
+
+    public static <T> void writeCollection(Collection<T> list, CustomConsumer<T> c) throws IOException {
+        for (T item : list ) {
+            c.accept(item);
+        }
+
+    }
+}
+
+interface CustomConsumer<T> {
+    void accept(T t) throws IOException;
 }
