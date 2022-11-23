@@ -79,11 +79,11 @@ public class DataStreamSerializer implements SerializeStrategy {
             Resume resume = new Resume(uuid, fullName);
             int size = dis.readInt();
             Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
-            for (int i = 0; i < size; i++) {
+            readCollection(size, () -> {
                 ContactType contactType = ContactType.valueOf(dis.readUTF());
                 String value = dis.readUTF();
                 contacts.put(contactType, value);
-            }
+            });
             resume.setContacts(contacts);
             int sizeOfSections = dis.readInt();
             Map<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
@@ -96,16 +96,16 @@ public class DataStreamSerializer implements SerializeStrategy {
                     case QUALIFICATIONS:
                         int sizeOfListSection = dis.readInt();
                         List<String> sectionItems = new ArrayList<>();
-                        for (int j = 0; j < sizeOfListSection; j++) {
+                        readCollection(sizeOfListSection, () -> {
                             sectionItems.add(dis.readUTF());
-                        }
+                        });
                         sections.put(sectionType, new ListSection(sectionItems));
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
                         int sizeOfExperienceSection = dis.readInt();
                         List<Organization> organizations = new ArrayList<>();
-                        for (int j = 0; j < sizeOfExperienceSection; j++) {
+                        readCollection(sizeOfExperienceSection, () -> {
                             Link link = null;
                             String value = dis.readUTF();
                             if (!value.equals(NULL_HOLDER)) {
@@ -115,15 +115,15 @@ public class DataStreamSerializer implements SerializeStrategy {
                             }
                             int sizeOfPeriods = dis.readInt();
                             List<Period> periods = new ArrayList<>();
-                            for (int k = 0; k < sizeOfPeriods; k++) {
+                            readCollection(sizeOfPeriods, () -> {
                                 LocalDate startDate = LocalDate.parse(dis.readUTF(), FORMATTER);
                                 LocalDate endDate = LocalDate.parse(dis.readUTF(), FORMATTER);
                                 String position = dis.readUTF();
                                 String description = dis.readUTF();
                                 periods.add(new Period(startDate, endDate, position, description));
-                            }
+                            });
                             organizations.add(new Organization(link, periods));
-                        }
+                        });
                         sections.put(sectionType, new ExperienceSection(organizations));
                         break;
                     default:
@@ -135,14 +135,23 @@ public class DataStreamSerializer implements SerializeStrategy {
         }
     }
 
-    public static <T> void writeCollection(Collection<T> list, CustomConsumer<T> c) throws IOException {
-        for (T item : list ) {
+    public static <T> void writeCollection(Collection<T> collection, CustomConsumer<T> c) throws IOException {
+        for (T item : collection) {
             c.accept(item);
         }
+    }
 
+    public static void readCollection(int count, CustomSupplier supplier) throws IOException {
+        for (int i = 0; i < count; i++) {
+            supplier.get();
+        }
     }
 }
 
 interface CustomConsumer<T> {
     void accept(T t) throws IOException;
+}
+
+interface CustomSupplier {
+    void get() throws IOException;
 }
