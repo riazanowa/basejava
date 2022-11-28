@@ -17,17 +17,14 @@ public class DataStreamSerializer implements SerializeStrategy {
             dos.writeUTF(resume.getUuid());
             dos.writeUTF(resume.getFullName());
             Map<ContactType, String> contacts = resume.getContacts();
-            dos.writeInt(contacts.size());
             Set<Map.Entry<ContactType, String>> entrySet = contacts.entrySet();
-            writeCollection(entrySet, entry -> {
+            writeCollection(dos, entrySet, entry -> {
                 dos.writeUTF(entry.getKey().name());
                 dos.writeUTF(entry.getValue());
             });
             // TODO Implements sections
             Map<SectionType, AbstractSection> sections = resume.getSections();
-            dos.writeInt(sections.size());
-            Set<Map.Entry<SectionType, AbstractSection>> entries = sections.entrySet();
-            writeCollection(entries, entry -> {
+            writeCollection(dos, sections.entrySet(), entry -> {
                 SectionType sectionType = entry.getKey();
                 switch (sectionType) {
                     case OBJECTIVE:
@@ -36,17 +33,13 @@ public class DataStreamSerializer implements SerializeStrategy {
                     case QUALIFICATIONS:
                         dos.writeUTF(sectionType.name());
                         ListSection listSection = (ListSection) entry.getValue();
-                        List<String> items = listSection.getSectionItems();
-                        dos.writeInt(items.size());
-                        writeCollection(items, dos::writeUTF);
+                        writeCollection(dos, listSection.getSectionItems(), dos::writeUTF);
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
                         dos.writeUTF(sectionType.name());
                         ExperienceSection experienceSection = (ExperienceSection) entry.getValue();
-                        List<Organization> experienceStages = experienceSection.getExperienceStages();
-                        dos.writeInt(experienceStages.size());
-                        writeCollection(experienceStages, organization -> {
+                        writeCollection(dos, experienceSection.getExperienceStages(), organization -> {
                             Link link = organization.getLink();
                             if (link == null) {
                                 dos.writeUTF(NULL_HOLDER);
@@ -54,9 +47,7 @@ public class DataStreamSerializer implements SerializeStrategy {
                                 dos.writeUTF(link.getSiteName());
                                 dos.writeUTF(link.getUrl());
                             }
-                            List<Period> periods = organization.getPeriods();
-                            dos.writeInt(periods.size());
-                            writeCollection(periods, period -> {
+                            writeCollection(dos, organization.getPeriods(), period -> {
                                 dos.writeUTF(period.getStartDate().toString());
                                 dos.writeUTF(period.getEndDate().toString());
                                 dos.writeUTF(period.getPosition());
@@ -74,53 +65,43 @@ public class DataStreamSerializer implements SerializeStrategy {
     @Override
     public Resume doRead(InputStream inputStream) throws IOException {
         try (DataInputStream dis = new DataInputStream(inputStream)) {
-            String uuid = dis.readUTF();
-            String fullName = dis.readUTF();
-            Resume resume = new Resume(uuid, fullName);
-            int size = dis.readInt();
+            Resume resume = new Resume(dis.readUTF(), dis.readUTF());
+
             Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
-            readCollection(size, () -> {
-                ContactType contactType = ContactType.valueOf(dis.readUTF());
-                String value = dis.readUTF();
-                contacts.put(contactType, value);
+            readCollection(dis, () -> {
+                contacts.put(ContactType.valueOf(dis.readUTF()), dis.readUTF());
             });
             resume.setContacts(contacts);
-            int sizeOfSections = dis.readInt();
+
             Map<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
-            for (int i = 0; i < sizeOfSections; i++) {
+            readCollection(dis, () -> {
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
                 switch (Objects.requireNonNull(sectionType)) {
                     case OBJECTIVE:
                     case PERSONAL:
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
-                        int sizeOfListSection = dis.readInt();
                         List<String> sectionItems = new ArrayList<>();
-                        readCollection(sizeOfListSection, () -> {
+                        readCollection(dis, () -> {
                             sectionItems.add(dis.readUTF());
                         });
                         sections.put(sectionType, new ListSection(sectionItems));
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
-                        int sizeOfExperienceSection = dis.readInt();
                         List<Organization> organizations = new ArrayList<>();
-                        readCollection(sizeOfExperienceSection, () -> {
+                        readCollection(dis, () -> {
                             Link link = null;
                             String value = dis.readUTF();
                             if (!value.equals(NULL_HOLDER)) {
-                                String siteName = value;
-                                String url = dis.readUTF();
-                                link = new Link(siteName, url);
+                                link = new Link(value, dis.readUTF());
                             }
-                            int sizeOfPeriods = dis.readInt();
                             List<Period> periods = new ArrayList<>();
-                            readCollection(sizeOfPeriods, () -> {
-                                LocalDate startDate = LocalDate.parse(dis.readUTF(), FORMATTER);
-                                LocalDate endDate = LocalDate.parse(dis.readUTF(), FORMATTER);
-                                String position = dis.readUTF();
-                                String description = dis.readUTF();
-                                periods.add(new Period(startDate, endDate, position, description));
+                            readCollection(dis, () -> {
+                                periods.add(new Period(LocalDate.parse(dis.readUTF(), FORMATTER),
+                                        LocalDate.parse(dis.readUTF(), FORMATTER),
+                                        dis.readUTF(),
+                                        dis.readUTF()));
                             });
                             organizations.add(new Organization(link, periods));
                         });
@@ -129,19 +110,21 @@ public class DataStreamSerializer implements SerializeStrategy {
                     default:
                         throw new IllegalArgumentException("Data is not correct");
                 }
-            }
+            });
             resume.setSections(sections);
             return resume;
         }
     }
 
-    public static <T> void writeCollection(Collection<T> collection, CustomConsumer<T> c) throws IOException {
+    public static <T> void writeCollection(DataOutputStream dos, Collection<T> collection, CustomConsumer<T> c) throws IOException {
+        dos.writeInt(collection.size());
         for (T item : collection) {
             c.accept(item);
         }
     }
 
-    public static void readCollection(int count, CustomSupplier supplier) throws IOException {
+    public static void readCollection(DataInputStream dis, CustomSupplier supplier) throws IOException {
+        int count = dis.readInt();
         for (int i = 0; i < count; i++) {
             supplier.get();
         }
