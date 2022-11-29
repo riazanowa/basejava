@@ -26,18 +26,17 @@ public class DataStreamSerializer implements SerializeStrategy {
             Map<SectionType, AbstractSection> sections = resume.getSections();
             writeCollection(dos, sections.entrySet(), entry -> {
                 SectionType sectionType = entry.getKey();
+                dos.writeUTF(sectionType.name());
                 switch (sectionType) {
                     case OBJECTIVE:
                     case PERSONAL:
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
-                        dos.writeUTF(sectionType.name());
                         ListSection listSection = (ListSection) entry.getValue();
                         writeCollection(dos, listSection.getSectionItems(), dos::writeUTF);
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
-                        dos.writeUTF(sectionType.name());
                         ExperienceSection experienceSection = (ExperienceSection) entry.getValue();
                         writeCollection(dos, experienceSection.getExperienceStages(), organization -> {
                             Link link = organization.getLink();
