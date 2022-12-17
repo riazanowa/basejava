@@ -80,29 +80,23 @@ public class DataStreamSerializer implements SerializeStrategy {
                     case PERSONAL:
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
-                        List<String> sectionItems = new ArrayList<>();
-                        readCollection(dis, () -> {
-                            sectionItems.add(dis.readUTF());
-                        });
+                        List<String> sectionItems = readList(dis, dis::readUTF);
                         sections.put(sectionType, new ListSection(sectionItems));
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
-                        List<Organization> organizations = new ArrayList<>();
-                        readCollection(dis, () -> {
+                        List<Organization> organizations = readList(dis, () -> {
                             Link link = null;
                             String value = dis.readUTF();
                             if (!value.equals(NULL_HOLDER)) {
                                 link = new Link(value, dis.readUTF());
                             }
-                            List<Period> periods = new ArrayList<>();
-                            readCollection(dis, () -> {
-                                periods.add(new Period(LocalDate.parse(dis.readUTF(), FORMATTER),
-                                        LocalDate.parse(dis.readUTF(), FORMATTER),
-                                        dis.readUTF(),
-                                        dis.readUTF()));
-                            });
-                            organizations.add(new Organization(link, periods));
+                            List<Period> periods = readList(dis, () ->
+                                    new Period(LocalDate.parse(dis.readUTF(), FORMATTER),
+                                            LocalDate.parse(dis.readUTF(), FORMATTER),
+                                            dis.readUTF(),
+                                            dis.readUTF()));
+                            return new Organization(link, periods);
                         });
                         sections.put(sectionType, new ExperienceSection(organizations));
                         break;
@@ -122,7 +116,20 @@ public class DataStreamSerializer implements SerializeStrategy {
         }
     }
 
-    public static void readCollection(DataInputStream dis, CustomSupplier supplier) throws IOException {
+    public static <T> List<T> readList(DataInputStream dis, ElementSupplier<T> supplier) throws IOException {
+        int count = dis.readInt();
+        List<T> list = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            list.add(supplier.get());
+        }
+        return list;
+    }
+
+    interface ElementSupplier<T> {
+        T get() throws IOException;
+    }
+
+    public static <T> void readCollection(DataInputStream dis, CustomSupplier<T> supplier) throws IOException {
         int count = dis.readInt();
         for (int i = 0; i < count; i++) {
             supplier.get();
@@ -134,6 +141,6 @@ interface CustomConsumer<T> {
     void accept(T t) throws IOException;
 }
 
-interface CustomSupplier {
+interface CustomSupplier<T> {
     void get() throws IOException;
 }
