@@ -40,12 +40,8 @@ public class DataStreamSerializer implements SerializeStrategy {
                         ExperienceSection experienceSection = (ExperienceSection) entry.getValue();
                         writeCollection(dos, experienceSection.getExperienceStages(), organization -> {
                             Link link = organization.getLink();
-                            if (link == null) {
-                                dos.writeUTF(NULL_HOLDER);
-                            } else {
-                                dos.writeUTF(link.getSiteName());
-                                dos.writeUTF(link.getUrl());
-                            }
+                            dos.writeUTF(link.getSiteName());
+                            dos.writeUTF(link.getUrl() == null ? NULL_HOLDER : link.getUrl());
                             writeCollection(dos, organization.getPeriods(), period -> {
                                 dos.writeUTF(period.getStartDate().toString());
                                 dos.writeUTF(period.getEndDate().toString());
@@ -86,10 +82,10 @@ public class DataStreamSerializer implements SerializeStrategy {
                     case EXPERIENCE:
                     case EDUCATION:
                         List<Organization> organizations = readList(dis, () -> {
-                            Link link = null;
-                            String value = dis.readUTF();
-                            if (!value.equals(NULL_HOLDER)) {
-                                link = new Link(value, dis.readUTF());
+                            Link link = new Link(dis.readUTF(), null);
+                            String url = dis.readUTF();
+                            if (!url.equals(NULL_HOLDER)) {
+                                link.setUrl(url);
                             }
                             List<Period> periods = readList(dis, () ->
                                     new Period(LocalDate.parse(dis.readUTF(), FORMATTER),
