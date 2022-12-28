@@ -23,8 +23,8 @@ public class MainConcurrency {
 
         int amount1 = 50;
         int amount2 = 20;
-        Thread t1 = createTask(ACCOUNT_1, ACCOUNT_2, amount1, (Object acc1, int amount) -> deposit(acc1, amount), (Object acc, int amount) -> withdraw(acc, amount));
-        Thread t2 = createTask(ACCOUNT_2, ACCOUNT_1, amount2, (Object acc, int amount) -> withdraw(acc, amount), (Object acc, int amount) -> deposit(acc, amount));
+        Thread t1 = createTask(ACCOUNT_1, ACCOUNT_2, amount1, MainConcurrency::deposit, MainConcurrency::withdraw);
+        Thread t2 = createTask(ACCOUNT_2, ACCOUNT_1, amount2, MainConcurrency::withdraw, MainConcurrency::deposit);
         t1.start();
         t2.start();
     }
