@@ -1,20 +1,10 @@
 package com.urise.webapp.storage;
 
+import com.urise.webapp.util.Config;
+
 public class SqlStorageTest extends AbstractStorageTest {
 
     public SqlStorageTest() {
-        super(new SqlStorage());
-    }
-
-    @Override
-    public void updateNotExistentResume() {
-    }
-
-    @Override
-    public void deleteNonexistentResume() {
-    }
-
-    @Override
-    public void saveExistentResume() {
+        super(Config.getInstance().getStorage());
     }
 }

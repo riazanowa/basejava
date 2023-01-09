@@ -1,35 +1,30 @@
 package com.urise.webapp.util;
 
-import com.urise.webapp.exception.StorageException;
+import com.urise.webapp.sql.ConnectionFactory;
+import com.urise.webapp.sql.SQLFunction;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class SQLHelper {
 
-    public static final String DB_URL = Config.getInstance().getDbUrl();
-    public static final String DB_USER = Config.getInstance().getDbUser();
-    public static final String DB_PASSWORD = Config.getInstance().getDbPassword();
+    private final ConnectionFactory connectionFactory;
 
-    public static Connection connection;
-
-    public SQLHelper() {
+    public SQLHelper(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
     }
 
-    public static Connection getConnection() {
-        if (connection == null) {
-            try {
-                Class.forName("org.postgresql.Driver");
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            } catch (SQLException e) {
-                throw new StorageException(e);
-            }
+    public void execute(String sqlQuery) {
+        execute(sqlQuery, ps -> ps.execute());
+    }
+
+    public <T> T execute(String sqlQuery, SQLFunction<T> function) {
+        try (Connection connection = connectionFactory.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sqlQuery)) {
+            return function.apply(ps);
+        } catch (SQLException e) {
+            throw ExceptionUtil.convertException(e);
         }
-        return connection;
     }
 }
