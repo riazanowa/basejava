@@ -78,4 +78,8 @@ public class Resume implements Comparable<Resume>, Serializable {
     public int compareTo(Resume o) {
         return uuid.compareTo(o.uuid);
     }
+
+    public void addContact(ContactType type, String value) {
+        contacts.put(type, value);
+    }
 }
